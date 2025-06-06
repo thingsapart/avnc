@@ -178,6 +178,7 @@ class VncActivity : AppCompatActivity() {
         // Enable the TouchPanningInputDevice by default. Its use is now governed by
         // Dispatcher's gesture mapping and its internal enabled flag.
         touchHandler.getTouchPanningInputDevice().enable()
+        touchHandler.getTouchPanningInputDevice().setPanningListener(viewModel)
 
         // Setup initial state of other panning devices based on preferences
         val xrPrefs = viewModel.pref.xr // Convenience accessor
