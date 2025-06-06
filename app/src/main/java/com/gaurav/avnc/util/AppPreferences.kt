@@ -14,6 +14,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import kotlin.reflect.KProperty
+import kotlin.math.roundToInt // Added import
 
 /**
  * Utility class for accessing app preferences
@@ -166,6 +167,69 @@ class AppPreferences(context: Context) {
         var enableTouchPanning by BooleanPref("xr_enable_touch_panning", true) // Touch panning is often a primary input
         var enablePhoneImuDeltaPanning by BooleanPref("xr_enable_phone_imu_delta_panning", false) // Default to off to avoid conflict if rotation is preferred
         var enablePhoneRotationPanning by BooleanPref("xr_enable_phone_rotation_panning", false) // Default to off
+
+        // Viture Panning Sensitivities
+        var viturePanSensitivityX: Float
+            get() {
+                val intValue = prefs.getInt("xr_viture_sensitivity_x_int", 60)
+                return -5.0f + intValue * 0.1f
+            }
+            set(value) {
+                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
+                prefs.edit { putInt("xr_viture_sensitivity_x_int", intValue) }
+            }
+
+        var viturePanSensitivityY: Float
+            get() {
+                val intValue = prefs.getInt("xr_viture_sensitivity_y_int", 60)
+                return -5.0f + intValue * 0.1f
+            }
+            set(value) {
+                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
+                prefs.edit { putInt("xr_viture_sensitivity_y_int", intValue) }
+            }
+
+        // Phone IMU Delta Panning Sensitivities
+        var phoneImuDeltaPanSensitivityX: Float
+            get() {
+                val intValue = prefs.getInt("xr_phone_imu_delta_sensitivity_x_int", 60)
+                return -5.0f + intValue * 0.1f
+            }
+            set(value) {
+                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
+                prefs.edit { putInt("xr_phone_imu_delta_sensitivity_x_int", intValue) }
+            }
+
+        var phoneImuDeltaPanSensitivityY: Float
+            get() {
+                val intValue = prefs.getInt("xr_phone_imu_delta_sensitivity_y_int", 60)
+                return -5.0f + intValue * 0.1f
+            }
+            set(value) {
+                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
+                prefs.edit { putInt("xr_phone_imu_delta_sensitivity_y_int", intValue) }
+            }
+
+        // Phone Rotation Panning Sensitivities
+        var phoneRotationPanSensitivityX: Float
+            get() {
+                val intValue = prefs.getInt("xr_phone_rotation_sensitivity_x_int", 60)
+                return -5.0f + intValue * 0.1f
+            }
+            set(value) {
+                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
+                prefs.edit { putInt("xr_phone_rotation_sensitivity_x_int", intValue) }
+            }
+
+        var phoneRotationPanSensitivityY: Float
+            get() {
+                val intValue = prefs.getInt("xr_phone_rotation_sensitivity_y_int", 60)
+                return -5.0f + intValue * 0.1f
+            }
+            set(value) {
+                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
+                prefs.edit { putInt("xr_phone_rotation_sensitivity_y_int", intValue) }
+            }
     }
 
     /****************************** Migrations *******************************/
