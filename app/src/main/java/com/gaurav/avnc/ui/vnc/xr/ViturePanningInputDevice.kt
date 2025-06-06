@@ -18,6 +18,8 @@ class ViturePanningInputDevice(private val activity: Activity) : PanningInputDev
     private val TAG = "ViturePanningDevice"
     private var mArManager: ArManager? = null
     private var mSdkInitSuccess = -1
+    private var isEventIdInitReceived: Boolean = false
+    private var isPendingEnable: Boolean = false
     private var listener: PanningListener? = null
     private var enabled = false
     private val uiHandler = Handler(Looper.getMainLooper())
@@ -50,12 +52,21 @@ class ViturePanningInputDevice(private val activity: Activity) : PanningInputDev
         override fun onEvent(eventId: Int, event: ByteArray?, l: Long) {
             Log.d(TAG, "onEvent: eventId=$eventId, eventData: ${event?.joinToString { "%02x".format(it) }}")
             if (eventId == Constants.EVENT_ID_INIT) {
+                isEventIdInitReceived = true
                 if (event != null) {
                     val initResult = byteArrayToInt(event, 0, event.size)
                     mSdkInitSuccess = initResult // Update mSdkInitSuccess
-                    Log.i(TAG, "Received EVENT_ID_INIT from Viture SDK. Parsed mSdkInitSuccess: $mSdkInitSuccess. Event data: ${event.joinToString { "%02x".format(it) }}")
+                    Log.i(TAG, "EVENT_ID_INIT received. mSdkInitSuccess: $mSdkInitSuccess, isPendingEnable: $isPendingEnable")
                     if (mSdkInitSuccess != Constants.ERROR_INIT_SUCCESS) {
                         Log.e(TAG, "Viture SDK onEvent reported non-success initialization status: $mSdkInitSuccess")
+                    }
+                    if (mSdkInitSuccess == Constants.ERROR_INIT_SUCCESS && isPendingEnable) {
+                        Log.i(TAG, "EVENT_ID_INIT successful and enable was pending. Attempting IMU activation.")
+                        if (performImuActivation()) {
+                            isPendingEnable = false // Clear flag only if activation succeeded
+                        } else {
+                            Log.w(TAG, "performImuActivation failed after EVENT_ID_INIT. IMU may not be active.")
+                        }
                     }
                 } else {
                     Log.w(TAG, "Received EVENT_ID_INIT with null event data.")
@@ -118,58 +129,122 @@ class ViturePanningInputDevice(private val activity: Activity) : PanningInputDev
         }
     }
 
+    private fun performImuActivation(): Boolean {
+        if (mArManager == null) {
+            Log.e(TAG, "performImuActivation: mArManager is null. Cannot activate IMU.")
+            return false
+        }
+
+        // Always register the callback before performing operations that might rely on it
+        // or if it was unregistered by a previous disable() call.
+        mArManager?.registerCallback(mCallback)
+        Log.i(TAG, "performImuActivation: Callback registered.")
+
+        val imuOnResult = mArManager?.setImuOn(true)
+        Log.i(TAG, "performImuActivation: mArManager.setImuOn(true) called. Return code: $imuOnResult")
+
+        if (imuOnResult == Constants.ERR_SET_SUCCESS) {
+            enabled = true
+            mLastYaw = null
+            mLastPitch = null
+            Log.i(TAG, "performImuActivation: Viture IMU enabled successfully via setImuOn(true).")
+
+            val set3DResult = mArManager?.set3D(false)
+            Log.i(TAG, "performImuActivation: mArManager.set3D(false) called. Return code: $set3DResult")
+
+            if (set3DResult != Constants.ERR_SET_SUCCESS) {
+                Log.e(TAG, "performImuActivation: Failed to set 3D mode to false. Error code: $set3DResult. This might affect IMU data, but IMU is considered enabled.")
+                // Depending on strictness, you could return false here or unregister callback and set enabled = false
+                // For now, we'll consider IMU 'enabled' but log the error for set3D.
+            } else {
+                Log.i(TAG, "performImuActivation: Successfully set 3D mode to false.")
+            }
+            return true // IMU successfully turned on, set3D attempted.
+        } else {
+            Log.e(TAG, "performImuActivation: Failed to enable Viture IMU via setImuOn(true). Error code: $imuOnResult.")
+            // Since setImuOn failed, ensure 'enabled' is false and unregister the callback as we likely won't get IMU data.
+            enabled = false
+            mArManager?.unregisterCallback(mCallback)
+            Log.i(TAG, "performImuActivation: Callback unregistered due to setImuOn failure.")
+            return false
+        }
+    }
+
     override fun setPanningListener(listener: PanningListener?) {
         this.listener = listener
     }
 
     override fun enable() {
-        if (mArManager == null || mSdkInitSuccess != Constants.ERROR_INIT_SUCCESS) {
-            Log.w(TAG, "Cannot enable: Viture SDK not initialized.")
+        if (mArManager == null) {
+            Log.w(TAG, "Cannot enable: Viture SDK (mArManager) is null.")
             return
         }
-        if (enabled) return
 
-        mArManager?.registerCallback(mCallback) // This should be before setImuOn generally
-        val result = mArManager?.setImuOn(true)
-        Log.i(TAG, "mArManager.setImuOn(true) called. Return code: $result") // Log the result
-        if (result == Constants.ERR_SET_SUCCESS) {
-            enabled = true
-            mLastYaw = null
-            mLastPitch = null
-            Log.i(TAG, "Viture IMU enabled successfully via setImuOn(true).")
+        if (enabled) {
+            Log.i(TAG, "Enable called, but IMU is already enabled.")
+            return
+        }
 
-           val set3DResult = mArManager?.set3D(false)
-           Log.i(TAG, "mArManager.set3D(false) called. Return code: $set3DResult")
-           if (set3DResult != Constants.ERR_SET_SUCCESS) {
-               Log.e(TAG, "Failed to set 3D mode to false. Error code: $set3DResult. This might affect IMU data.")
-               // Optional: Consider if we should disable IMU or revert 'enabled' state if set3D(false) is critical
-               // For now, just logging the error.
-           } else {
-               Log.i(TAG, "Successfully set 3D mode to false.")
-           }
+        // Clear any previous pending state, as we are now explicitly trying to enable.
+        // isPendingEnable = false; // This will be set to true only if we defer.
+
+        Log.i(TAG, "Enable called. isEventIdInitReceived: $isEventIdInitReceived, mSdkInitSuccess: $mSdkInitSuccess")
+
+        if (isEventIdInitReceived) {
+            if (mSdkInitSuccess == Constants.ERROR_INIT_SUCCESS) {
+                Log.i(TAG, "Enable: EVENT_ID_INIT already received and was successful. Attempting IMU activation directly.")
+                performImuActivation() // This function now handles setting 'enabled' flag.
+            } else {
+                Log.e(TAG, "Enable: EVENT_ID_INIT already received but indicated failure (code: $mSdkInitSuccess). Cannot enable IMU.")
+                // Ensure callback is not left registered if we are in a failed state and not going to pend.
+                // However, performImuActivation failure or onEvent failure should handle unregistration.
+                // For safety, if we know init failed, we can unregister.
+                // mArManager?.unregisterCallback(mCallback) // Consider if this is needed or if disable() path handles it.
+            }
         } else {
-            Log.e(TAG, "Failed to enable Viture IMU via setImuOn(true). Error code: $result. Unregistering callback.")
-            mArManager?.unregisterCallback(mCallback)
+            // EVENT_ID_INIT has not been received yet.
+            // This could be because init() is still ongoing, or permission dialog is up,
+            // or init() failed silently before and we are waiting for an event that might never come if it was a hard fail.
+            Log.i(TAG, "Enable: EVENT_ID_INIT not yet received. Setting isPendingEnable = true and ensuring callback is registered.")
+            isPendingEnable = true
+            // Ensure callback is registered to catch the EVENT_ID_INIT.
+            // If ArManager.init() failed very early (e.g. ArManager is null), this won't be reached.
+            // If ArManager.init() returned an error code synchronously, mSdkInitSuccess would reflect that.
+            // This path is primarily for when ArManager.init() returned success or a pending code,
+            // and we are truly waiting for the async EVENT_ID_INIT.
+            mArManager?.registerCallback(mCallback)
         }
     }
 
     override fun disable() {
+        Log.i(TAG, "Disable called. Current 'enabled' state: $enabled, 'isPendingEnable' state: $isPendingEnable")
+        isPendingEnable = false // Always clear pending enable on disable
+
         if (mArManager == null) {
-            // Log this, but don't crash. It might be called during cleanup.
-            Log.w(TAG, "Cannot disable: Viture SDK not initialized or already released.")
-            // return // Allow unregisterCallback to be called even if mArManager is null, to be safe
-        }
-        if (!enabled && mArManager != null) { // only try to turn off if ARManager exists
-            mArManager?.setImuOn(false) // Attempt to turn off hardware even if not "enabled" by our flag
+            Log.w(TAG, "Cannot disable: mArManager is null. Ensuring 'enabled' is false.")
+            enabled = false // Ensure our internal state is consistent
+            return
         }
 
-        enabled = false
+        if (enabled) { // Only try to turn off IMU if our flag says it was on
+            val result = mArManager?.setImuOn(false)
+            Log.i(TAG, "mArManager.setImuOn(false) called. Return code: $result")
+            if (result != Constants.ERR_SET_SUCCESS) {
+                Log.w(TAG, "Failed to turn off IMU via setImuOn(false). Error code: $result")
+            }
+        } else {
+            // If not 'enabled', but mArManager exists, one might still want to ensure IMU is off
+            // as a safety measure, though it shouldn't be necessary if logic is correct.
+            // For now, only acting if 'enabled' was true.
+            Log.i(TAG, "Disable called, but IMU was not marked as 'enabled'. Skipping setImuOn(false).")
+        }
+
+        enabled = false // Set our flag regardless of mArManager state or setImuOn result
+
+        // Always try to unregister the callback, as it might have been registered by 'enable()'
+        // even if 'performImuActivation' didn't complete or if 'isPendingEnable' was set.
         mArManager?.unregisterCallback(mCallback)
-        // Note: The SDK docs mention mArManager.release() for resource cleanup.
-        // This should be called when the device is permanently disconnected or app is closing,
-        // not just on disable if it might be re-enabled later.
-        // For now, release() is not called here. It should be managed by whoever owns this ViturePanningInputDevice.
-        Log.i(TAG, "Viture IMU disabled.")
+        Log.i(TAG, "Callback unregistered in disable(). Viture IMU should be disabled.")
     }
 
     override fun isEnabled(): Boolean {
@@ -178,15 +253,26 @@ class ViturePanningInputDevice(private val activity: Activity) : PanningInputDev
 
     // Consider adding a method to release SDK resources when this device is no longer needed.
     fun releaseSdk() {
+        Log.i(TAG, "releaseSdk called. Current 'enabled' state: $enabled")
         if (mArManager != null) {
-            if (enabled) {
-                disable()
-            }
+            // Call disable() to ensure IMU is turned off, callback is unregistered,
+            // and isPendingEnable is cleared.
+            disable() // This will also set 'enabled' to false.
+
             mArManager?.release()
+            Log.i(TAG, "mArManager.release() called.")
             mArManager = null
-            mSdkInitSuccess = -1 // Mark as uninitialized
-            Log.i(TAG, "Viture SDK resources released.")
+        } else {
+            Log.w(TAG, "releaseSdk called but mArManager was already null.")
         }
+
+        // Reset all relevant state flags to their initial values
+        mSdkInitSuccess = -1 // Mark as uninitialized
+        isEventIdInitReceived = false
+        // isPendingEnable is already cleared by disable()
+        // enabled is already set to false by disable()
+
+        Log.i(TAG, "Viture SDK resources released and state reset.")
     }
 
     private fun byteArrayToInt(bytes: ByteArray?, offset: Int = 0, length: Int = bytes?.size ?: 0): Int {
