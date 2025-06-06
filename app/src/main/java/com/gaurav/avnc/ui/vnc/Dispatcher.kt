@@ -9,7 +9,6 @@
 package com.gaurav.avnc.ui.vnc
 
 import android.graphics.PointF
-import android.widget.Toast // Import Toast
 import com.gaurav.avnc.ui.vnc.TouchPanningInputDevice // Added import
 import com.gaurav.avnc.viewmodel.VncViewModel
 import com.gaurav.avnc.vnc.Messenger
@@ -91,9 +90,6 @@ class Dispatcher(private val activity: VncActivity) {
         val mouseBackAction = selectPointAction(viewModel.pref.input.mouseBack)
 
         private fun selectPointAction(actionName: String): (PointF) -> Unit {
-            if (actionName == "center_xr_view") {
-                Toast.makeText(activity, "Dispatcher: 'center_xr_view' resolved by selectPointAction", Toast.LENGTH_SHORT).show() // DEBUG
-            }
             return when (actionName) {
                 "left-press" -> { p -> defaultMode.doButtonDown(PointerButton.Left, p) }
                 "left-click" -> { p -> defaultMode.doClick(PointerButton.Left, p) }
@@ -102,9 +98,8 @@ class Dispatcher(private val activity: VncActivity) {
                 "right-click" -> { p -> defaultMode.doClick(PointerButton.Right, p) }
                 "open-keyboard" -> { _ -> doOpenKeyboard() }
                 "center_xr_view" -> { _ ->
-                    Toast.makeText(activity, "Dispatcher: Executing 'center_xr_view' action", Toast.LENGTH_SHORT).show() // DEBUG
                     viewModel.requestViewReset()
-                } // New action
+                }
                 else -> { _ -> } //Nothing
             }
         }
@@ -156,7 +151,6 @@ class Dispatcher(private val activity: VncActivity) {
     fun onTap1(p: PointF) = config.tap1Action(p)
     fun onTap2(p: PointF) = config.tap2Action(p)
     fun onTap3(p: PointF) {
-        Toast.makeText(activity, "Dispatcher.onTap3 called", Toast.LENGTH_SHORT).show() // DEBUG
         config.tap3Action(p)
     }
     fun onDoubleTap(p: PointF) = config.doubleTapAction(p)

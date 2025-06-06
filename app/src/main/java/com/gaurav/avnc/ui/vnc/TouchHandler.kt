@@ -19,7 +19,6 @@ import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.ViewConfiguration
-import android.widget.Toast
 import com.gaurav.avnc.util.AppPreferences
 import com.gaurav.avnc.viewmodel.VncViewModel
 import com.gaurav.avnc.vnc.PointerButton
@@ -253,7 +252,6 @@ class TouchHandler(
             when (fingerCount) {
                 2 -> dispatcher.onTap2(e.point())
                 3 -> {
-                    Toast.makeText(frameView.context, "3-finger tap in TouchHandler", Toast.LENGTH_SHORT).show() // DEBUG
                     dispatcher.onTap3(e.point())
                 }
             }
