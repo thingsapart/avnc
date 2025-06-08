@@ -10,7 +10,6 @@ package com.gaurav.avnc.ui.home
 
 import android.app.ActivityOptions
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -34,7 +33,6 @@ import com.gaurav.avnc.ui.prefs.PrefsActivity
 import com.gaurav.avnc.ui.vnc.IntentReceiverActivity
 import com.gaurav.avnc.ui.vnc.startVncActivity
 import com.gaurav.avnc.util.Debugging
-import com.gaurav.avnc.util.DisplayUtils
 import com.gaurav.avnc.util.MsgDialog
 import com.gaurav.avnc.viewmodel.HomeViewModel
 import com.gaurav.avnc.vnc.VncClient
@@ -53,10 +51,6 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private val tabs = ServerTabs(this)
 
-    private var originalDisplaySize: String? = null
-    private var isXrResolutionActive = false
-    private lateinit var xrResolutionMenuItem: MenuItem // To change the icon later
-
     override fun onCreate(savedInstanceState: Bundle?) {
         // Theme and window features should be set before super.onCreate and setContentView
         setTheme(R.style.App_Theme)
@@ -71,13 +65,9 @@ class HomeActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         binding.lifecycleOwner = this
 
-        originalDisplaySize = DisplayUtils.getPhysicalDisplaySize(this)
-
         tabs.create(binding.tabLayout, binding.pager)
 
         binding.drawerNav.setNavigationItemSelectedListener { onMenuItemSelected(it.itemId) }
-        // Initialize xrResolutionMenuItem after drawerNav is available
-        xrResolutionMenuItem = binding.drawerNav.menu.findItem(R.id.nav_xr_resolution)
         binding.navigationBtn.setOnClickListener { binding.drawerLayout.open() }
         binding.settingsBtn.setOnClickListener { showSettings() }
         binding.urlbar.setOnClickListener { showUrlActivity() }
@@ -114,31 +104,7 @@ class HomeActivity : AppCompatActivity() {
             R.id.settings -> showSettings()
             R.id.about -> showAbout()
             R.id.report_bug -> launchBugReport()
-            R.id.nav_xr_resolution -> {
-                // Ensure xrResolutionMenuItem is initialized, ideally in onPrepareOptionsMenu or similar
-                // For now, we'll rely on the item passed to onNavigationItemSelected if possible,
-                // but a direct reference (xrResolutionMenuItem) is better for changing icons outside of click events.
-                // This example assumes 'it' from setNavigationItemSelectedListener is the MenuItem.
-                // If not, xrResolutionMenuItem needs to be found via binding.drawerNav.menu.findItem(R.id.nav_xr_resolution)
-                val item = binding.drawerNav.menu.findItem(itemId) // Get the MenuItem instance
-
-                if (isXrResolutionActive) {
-                    DisplayUtils.resetDisplaySize(this)
-                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                    item.setIcon(R.drawable.ic_fullscreen) // Change icon back
-                    isXrResolutionActive = false
-                } else {
-                    if (originalDisplaySize == null) { // Just in case it wasn't fetched
-                        originalDisplaySize = DisplayUtils.getPhysicalDisplaySize(this)
-                    }
-                    DisplayUtils.setDisplaySize(this, DisplayUtils.XR_DISPLAY_WIDTH, DisplayUtils.XR_DISPLAY_HEIGHT)
-                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    item.setIcon(R.drawable.ic_fullscreen_exit) // Change icon
-                    isXrResolutionActive = true
-                }
-                // binding.drawerLayout.close() // Close drawer after selection
-                // return true // Indicate item was handled
-            }
+            // R.id.nav_xr_resolution case removed
             else -> return false
         }
         binding.drawerLayout.close()
@@ -146,29 +112,13 @@ class HomeActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        // While xrResolutionMenuItem is now initialized in onCreate,
-        // if this options menu was also supposed to hold it, we'd find it here.
-        // However, for NavigationView, onCreate initialization is more direct.
-        // If home_drawer is exclusively for NavigationView, this might not be strictly necessary
-        // unless other option menus are also used.
-        val item = menu?.findItem(R.id.nav_xr_resolution)
-        if (item != null) {
-            xrResolutionMenuItem = item
-        }
+        // Removed content related to R.id.nav_xr_resolution or xrResolutionMenuItem
         return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onPause() {
         super.onPause()
-        if (isXrResolutionActive) {
-            DisplayUtils.resetDisplaySize(this)
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED // Or restore original if saved
-
-            if (::xrResolutionMenuItem.isInitialized) {
-                xrResolutionMenuItem.setIcon(R.drawable.ic_fullscreen)
-            }
-            isXrResolutionActive = false
-        }
+        // Removed if (isXrResolutionActive) block
     }
 
     private fun startNewConnection(profile: ServerProfile) {

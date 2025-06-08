@@ -21,9 +21,4 @@
         android:id="@+id/report_bug"
         android:icon="@drawable/ic_bug"
         android:title="@string/title_report_bug" />
-
-    <item
-        android:id="@+id/nav_xr_resolution"
-        android:icon="@drawable/ic_fullscreen"
-        android:title="XR Resolution" />
 </menu>

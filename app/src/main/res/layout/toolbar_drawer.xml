@@ -90,6 +90,12 @@
                     android:paddingStart="12dp"
                     android:paddingEnd="0dp"
                     tools:ignore="UnusedAttribute" />
+
+                <ImageButton
+                    android:id="@+id/xr_resolution_btn"
+                    style="@style/ImageButton"
+                    android:contentDescription="@string/desc_xr_resolution_btn"
+                    android:src="@drawable/ic_fullscreen" />
             </LinearLayout>
 
             <LinearLayout
