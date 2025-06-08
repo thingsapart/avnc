@@ -24,6 +24,7 @@ import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -38,6 +39,7 @@ import com.gaurav.avnc.R
 import com.gaurav.avnc.databinding.ActivityVncBinding
 import com.gaurav.avnc.model.ServerProfile
 import com.gaurav.avnc.util.DeviceAuthPrompt
+import com.gaurav.avnc.util.DisplayUtils
 import com.gaurav.avnc.util.SamsungDex
 import com.gaurav.avnc.viewmodel.VncViewModel
 import com.gaurav.avnc.viewmodel.VncViewModel.State.Companion.isConnected
@@ -112,6 +114,10 @@ class VncActivity : AppCompatActivity() {
     private var phoneImuPanningDevice: PhoneImuPanningInputDevice? = null
     private var phoneRotationPanningDevice: PhoneRotationPanningInputDevice? = null
 
+    private var originalDisplaySize: String? = null
+    private var isXrResolutionActive = false
+    private lateinit var xrResolutionButton: ImageButton
+
     override fun onCreate(savedInstanceState: Bundle?) {
         DeviceAuthPrompt.applyFingerprintDialogFix(supportFragmentManager)
 
@@ -128,6 +134,51 @@ class VncActivity : AppCompatActivity() {
         binding.frameView.initialize(this)
         viewModel.frameViewRef = WeakReference(binding.frameView)
         toolbar.initialize()
+
+        originalDisplaySize = DisplayUtils.getPhysicalDisplaySize(this)
+        // Attempt to find the button. This depends on how layouts are handled.
+        // For now, let's use a direct findViewById first as a fallback.
+        xrResolutionButton = findViewById<ImageButton>(R.id.xr_resolution_btn)
+
+        // Set the OnClickListener - the logic for inside the listener will be added in the next step
+        xrResolutionButton.setOnClickListener {
+            if (isXrResolutionActive) {
+                //if (DisplayUtils.resetDisplaySize(this)) {
+                if (DisplayUtils.clearForcedDisplaySize(this)) {
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    xrResolutionButton.setImageResource(R.drawable.ic_fullscreen)
+                    isXrResolutionActive = false
+                    Log.d("VncActivity", "XR resolution reset successfully.")
+                } else {
+                    Log.e("VncActivity", "Failed to reset XR resolution.")
+                    Toast.makeText(this, "Failed to reset XR resolution", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                if (originalDisplaySize == null) {
+                    originalDisplaySize = DisplayUtils.getPhysicalDisplaySize(this)
+                }
+                //val success = DisplayUtils.setDisplaySize(this, DisplayUtils.XR_DISPLAY_WIDTH, DisplayUtils.XR_DISPLAY_HEIGHT)
+                val success = DisplayUtils.setForcedDisplaySize(this, DisplayUtils.XR_DISPLAY_HEIGHT, DisplayUtils.XR_DISPLAY_WIDTH)
+                if (success) {
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    xrResolutionButton.setImageResource(R.drawable.ic_fullscreen_exit)
+                    isXrResolutionActive = true
+                    Log.d("VncActivity", "XR resolution set successfully to ${DisplayUtils.XR_DISPLAY_WIDTH}x${DisplayUtils.XR_DISPLAY_HEIGHT}.")
+
+                    // Add a delay and then re-check the resolution
+                    lifecycleScope.launch { // Using lifecycleScope, common for Activities
+                        delay(500) // Delay for 500 milliseconds
+                        val currentResolutionAfterSet = DisplayUtils.getPhysicalDisplaySize(this@VncActivity)
+                        Log.d("VncActivity", "Resolution reported by system after 500ms delay: $currentResolutionAfterSet")
+                        Toast.makeText(this@VncActivity, "System reports: $currentResolutionAfterSet", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Log.e("VncActivity", "Failed to set XR resolution. Check permissions or logs.")
+                    Toast.makeText(this, "Failed to set XR resolution. Check permissions.", Toast.LENGTH_LONG).show()
+                    // Keep orientation as is, don't set isXrResolutionActive to true, and don't change icon
+                }
+            }
+        }
 
         setupLayout()
         setupServerUnlock()
@@ -261,6 +312,22 @@ class VncActivity : AppCompatActivity() {
         if (viewModel.pref.viewer.pauseUpdatesInBackground)
             viewModel.pauseFrameBufferUpdates()
         wasConnectedWhenStopped = viewModel.state.value.isConnected
+    }
+
+    override fun onPause() {
+        super.onPause() // Call super.onPause() first
+
+        if (isXrResolutionActive) {
+            DisplayUtils.resetDisplaySize(this)
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED // Or restore original if saved
+
+            // Update the button icon. Ensure xrResolutionButton is initialized before onPause can be called.
+            if (::xrResolutionButton.isInitialized) {
+                xrResolutionButton.setImageResource(R.drawable.ic_fullscreen)
+            }
+            isXrResolutionActive = false
+        }
+        // If onPause has other existing code, make sure to keep it.
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

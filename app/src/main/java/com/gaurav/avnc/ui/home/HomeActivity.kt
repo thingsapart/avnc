@@ -14,6 +14,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.Window
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +35,7 @@ import com.gaurav.avnc.util.Debugging
 import com.gaurav.avnc.util.MsgDialog
 import com.gaurav.avnc.viewmodel.HomeViewModel
 import com.gaurav.avnc.vnc.VncClient
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,9 +51,14 @@ class HomeActivity : AppCompatActivity() {
     private val tabs = ServerTabs(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Theme and window features should be set before super.onCreate and setContentView
         setTheme(R.style.App_Theme)
-        super.onCreate(savedInstanceState)
         window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+        // Potentially add other window.requestFeature calls here if they were duplicated too,
+        // ensuring each specific feature is requested only once.
+        // From the provided code, only one type of feature request was shown duplicated.
+
+        super.onCreate(savedInstanceState) // Call super.onCreate ONCE
 
         //View Inflation
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
@@ -95,10 +103,21 @@ class HomeActivity : AppCompatActivity() {
             R.id.settings -> showSettings()
             R.id.about -> showAbout()
             R.id.report_bug -> launchBugReport()
+            // R.id.nav_xr_resolution case removed
             else -> return false
         }
         binding.drawerLayout.close()
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        // Removed content related to R.id.nav_xr_resolution or xrResolutionMenuItem
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Removed if (isXrResolutionActive) block
     }
 
     private fun startNewConnection(profile: ServerProfile) {
