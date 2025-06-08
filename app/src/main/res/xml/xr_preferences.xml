@@ -68,6 +68,14 @@
             app:min="0"
             app:showSeekBarValue="true"
             android:summary="Adjust vertical sensitivity (-5.0 to 5.0)" />
+    <ListPreference
+        app:key="xr_viture_imu_frequency"
+        app:title="Viture IMU Frequency"
+        app:summary="Select IMU frequency for Viture glasses."
+        app:entries="@array/xr_imu_frequency_entries"
+        app:entryValues="@array/xr_imu_frequency_values"
+        app:defaultValue="240"
+        app:dependency="xr_enable_viture_panning" />
         <Preference />
 
         <SwitchPreferenceCompat

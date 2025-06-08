@@ -144,6 +144,15 @@ class Toolbar(private val activity: VncActivity) {
         setupGestureExclusionRect()
         setupDrawerCloseOnScrimSwipe()
         updateXRButtonLabels() // Set initial text for XR buttons
+
+        // Make sure R.id.xr_resolution_btn exists in activity_vnc.xml and is an ImageButton
+        // Data binding should generate a field like 'xrResolutionBtn' in ActivityVncBinding
+        activity.binding.xrResolutionBtn.setOnClickListener {
+            activity.toggleXrResolution()
+        }
+        // Call this at the end of initialize to set the initial icon state
+        // This relies on isXrResolutionActive being made internal in VncActivity
+        updateXrResolutionButtonIcon(activity.isXrResolutionActive)
     }
 
     fun open() {
@@ -433,5 +442,16 @@ class Toolbar(private val activity: VncActivity) {
         val panningMode = viewModel.pref.xr.panningMode
         val panningModeStringRes = if (panningMode == "rotation") R.string.panning_mode_rotation else R.string.panning_mode_offset_surface
         //binding.xrPanningModeBtn.text = activity.getString(R.string.btn_toggle_panning_mode_formatted, activity.getString(panningModeStringRes))
+    }
+
+    fun updateXrResolutionButtonIcon(isXrActive: Boolean) {
+        val iconRes = if (isXrActive) {
+            com.gaurav.avnc.R.drawable.ic_fullscreen_exit
+        } else {
+            com.gaurav.avnc.R.drawable.ic_fullscreen
+        }
+        // Assuming xr_resolution_btn is part of activity_vnc.xml layout
+        // and accessible via activity.binding (ActivityVncBinding)
+        activity.binding.xrResolutionBtn.setImageResource(iconRes)
     }
 }

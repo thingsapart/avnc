@@ -260,4 +260,18 @@
     <string name="desc_xr_resolution_btn">Toggle XR Resolution</string>
     <string name="desc_xr_display_mode_btn">Toggle XR Display Mode</string>
     <string name="desc_xr_panning_mode_btn">Toggle XR Panning Mode</string>
+
+    <string-array name="xr_imu_frequency_entries">
+        <item>60 Hz</item>
+        <item>90 Hz</item>
+        <item>120 Hz</item>
+        <item>240 Hz</item>
+    </string-array>
+
+    <string-array name="xr_imu_frequency_values">
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
+        <item>240</item>
+    </string-array>
 </resources>
