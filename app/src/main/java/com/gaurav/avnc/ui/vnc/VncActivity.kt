@@ -162,6 +162,14 @@ class VncActivity : AppCompatActivity() {
                     xrResolutionButton.setImageResource(R.drawable.ic_fullscreen_exit)
                     isXrResolutionActive = true
                     Log.d("VncActivity", "XR resolution set successfully to ${DisplayUtils.XR_DISPLAY_WIDTH}x${DisplayUtils.XR_DISPLAY_HEIGHT}.")
+
+                    // Add a delay and then re-check the resolution
+                    lifecycleScope.launch { // Using lifecycleScope, common for Activities
+                        delay(500) // Delay for 500 milliseconds
+                        val currentResolutionAfterSet = DisplayUtils.getPhysicalDisplaySize(this@VncActivity)
+                        Log.d("VncActivity", "Resolution reported by system after 500ms delay: $currentResolutionAfterSet")
+                        Toast.makeText(this@VncActivity, "System reports: $currentResolutionAfterSet", Toast.LENGTH_LONG).show()
+                    }
                 } else {
                     Log.e("VncActivity", "Failed to set XR resolution. Check permissions or logs.")
                     Toast.makeText(this, "Failed to set XR resolution. Check permissions.", Toast.LENGTH_LONG).show()
