@@ -241,6 +241,31 @@ object DisplayUtils {
     }
 
     /**
+     * Clears the forced display density, reverting to the physical display density.
+     * Requires the WRITE_SECURE_SETTINGS permission.
+     * @param context The application context.
+     * @return true if successful, false otherwise.
+     */
+    fun clearForcedDisplayDensity(context: Context): Boolean {
+        if (context.checkCallingOrSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.e(TAG, "Permission denial: App needs android.permission.WRITE_SECURE_SETTINGS")
+            return false
+        }
+        try {
+            val wm: Any = getWindowManager() ?: return false
+            val clearForcedDisplayDensityMethod = wm.javaClass.getMethod(
+                    "clearForcedDisplayDensity", Int::class.javaPrimitiveType)
+            Log.d(TAG, "Clearing forced display density.")
+            clearForcedDisplayDensityMethod.invoke(wm, Display.DEFAULT_DISPLAY)
+            return true
+        } catch (e: java.lang.Exception) {
+            Log.e(TAG, "Failed to clear display density", e)
+            return false
+        }
+    }
+
+    /**
      * Resets the display cutout emulation developer setting.
      * Requires the WRITE_SECURE_SETTINGS permission.
      * @param context The application context.
@@ -285,5 +310,26 @@ object DisplayUtils {
         Log.i(TAG, "All display overrides have been reset. A reboot may be required to clear all visual artifacts.")
 
         return cutoutSuccess && densitySuccess && sizeSuccess
+    }
+
+    @SuppressLint("PrivateApi")
+    private fun getWindowManager(): Any? {
+        try {
+            val serviceManagerClass = Class.forName("android.os.ServiceManager")
+            val getServiceMethod = serviceManagerClass.getMethod("getService", String::class.java)
+            val windowManagerBinder = getServiceMethod.invoke(null, "window") as IBinder
+
+            if (windowManagerBinder == null) {
+                Log.e(TAG, "Failed to get window manager binder.")
+                return null
+            }
+
+            val windowManagerStubClass = Class.forName("android.view.IWindowManager\$Stub")
+            val asInterfaceMethod = windowManagerStubClass.getMethod("asInterface", IBinder::class.java)
+            return asInterfaceMethod.invoke(null, windowManagerBinder)
+        } catch (e: java.lang.Exception) {
+            Log.e(TAG, "Failed to get IWindowManager instance", e)
+            return null
+        }
     }
 }
