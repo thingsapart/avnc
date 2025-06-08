@@ -170,66 +170,32 @@ class AppPreferences(context: Context) {
 
         // Viture Panning Sensitivities
         var viturePanSensitivityX: Float
-            get() {
-                val intValue = prefs.getInt("xr_viture_sensitivity_x_int", 60)
-                return -5.0f + intValue * 0.1f
-            }
-            set(value) {
-                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
-                prefs.edit { putInt("xr_viture_sensitivity_x_int", intValue) }
-            }
+            get() = prefs.getInt("xr_viture_sensitivity_x_int", 0) / 10.0f
+            set(value) = prefs.edit().putInt("xr_viture_sensitivity_x_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
 
         var viturePanSensitivityY: Float
-            get() {
-                val intValue = prefs.getInt("xr_viture_sensitivity_y_int", 60)
-                return -5.0f + intValue * 0.1f
-            }
-            set(value) {
-                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
-                prefs.edit { putInt("xr_viture_sensitivity_y_int", intValue) }
-            }
+            get() = prefs.getInt("xr_viture_sensitivity_y_int", 0) / 10.0f
+            set(value) = prefs.edit().putInt("xr_viture_sensitivity_y_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
 
         // Phone IMU Delta Panning Sensitivities
-        var phoneImuDeltaPanSensitivityX: Float
-            get() {
-                val intValue = prefs.getInt("xr_phone_imu_delta_sensitivity_x_int", 60)
-                return -5.0f + intValue * 0.1f
-            }
-            set(value) {
-                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
-                prefs.edit { putInt("xr_phone_imu_delta_sensitivity_x_int", intValue) }
-            }
+        // Corrected property name to match potential usage, assuming it's phoneImuDeltaSensitivityX not phoneImuDeltaPanSensitivityX
+        var phoneImuDeltaSensitivityX: Float
+            get() = prefs.getInt("xr_phone_imu_delta_sensitivity_x_int", 0) / 10.0f
+            set(value) = prefs.edit().putInt("xr_phone_imu_delta_sensitivity_x_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
 
-        var phoneImuDeltaPanSensitivityY: Float
-            get() {
-                val intValue = prefs.getInt("xr_phone_imu_delta_sensitivity_y_int", 60)
-                return -5.0f + intValue * 0.1f
-            }
-            set(value) {
-                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
-                prefs.edit { putInt("xr_phone_imu_delta_sensitivity_y_int", intValue) }
-            }
+        var phoneImuDeltaSensitivityY: Float
+            get() = prefs.getInt("xr_phone_imu_delta_sensitivity_y_int", 0) / 10.0f
+            set(value) = prefs.edit().putInt("xr_phone_imu_delta_sensitivity_y_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
 
         // Phone Rotation Panning Sensitivities
-        var phoneRotationPanSensitivityX: Float
-            get() {
-                val intValue = prefs.getInt("xr_phone_rotation_sensitivity_x_int", 60)
-                return -5.0f + intValue * 0.1f
-            }
-            set(value) {
-                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
-                prefs.edit { putInt("xr_phone_rotation_sensitivity_x_int", intValue) }
-            }
+        // Corrected property name
+        var phoneRotationSensitivityX: Float
+            get() = prefs.getInt("xr_phone_rotation_sensitivity_x_int", 0) / 10.0f
+            set(value) = prefs.edit().putInt("xr_phone_rotation_sensitivity_x_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
 
-        var phoneRotationPanSensitivityY: Float
-            get() {
-                val intValue = prefs.getInt("xr_phone_rotation_sensitivity_y_int", 60)
-                return -5.0f + intValue * 0.1f
-            }
-            set(value) {
-                val intValue = ((value + 5.0f) / 0.1f).roundToInt().coerceIn(0, 100)
-                prefs.edit { putInt("xr_phone_rotation_sensitivity_y_int", intValue) }
-            }
+        var phoneRotationSensitivityY: Float
+            get() = prefs.getInt("xr_phone_rotation_sensitivity_y_int", 0) / 10.0f
+            set(value) = prefs.edit().putInt("xr_phone_rotation_sensitivity_y_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
     }
 
     /****************************** Migrations *******************************/

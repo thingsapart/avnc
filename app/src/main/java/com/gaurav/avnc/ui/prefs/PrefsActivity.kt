@@ -187,7 +187,35 @@ class PrefsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreference
         // can be added here, for example, in onViewCreated or by observing preference changes.
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-            super.onCreatePreferences(savedInstanceState, rootKey)
+            super.onCreatePreferences(savedInstanceState, rootKey) // This loads R.xml.xr_preferences
+
+            val displayModePref = findPreference<ListPreference>("xr_display_mode")
+            displayModePref?.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+
+            val panningModePref = findPreference<ListPreference>("xr_panning_mode")
+            panningModePref?.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+
+            val vitureImuFrequencyPref = findPreference<ListPreference>("xr_viture_imu_frequency")
+            vitureImuFrequencyPref?.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+
+            // Setup summary providers for sensitivity SeekBarPreferences
+            val sensitivityKeys = listOf(
+                "xr_viture_sensitivity_x_int",
+                "xr_viture_sensitivity_y_int",
+                "xr_phone_imu_delta_sensitivity_x_int",
+                "xr_phone_imu_delta_sensitivity_y_int",
+                "xr_phone_rotation_sensitivity_x_int",
+                "xr_phone_rotation_sensitivity_y_int"
+            )
+
+            sensitivityKeys.forEach { key ->
+                findPreference<SeekBarPreference>(key)?.summaryProvider =
+                    Preference.SummaryProvider<SeekBarPreference> { seekBarPref ->
+                        val floatValue = seekBarPref.value / 10.0f
+                        "Current: ${String.format("%.1f", floatValue)}"
+                    }
+            }
+
             // Initial check to set enablement state based on current preference value
             updateCylinderRadiusEnablement()
         }
