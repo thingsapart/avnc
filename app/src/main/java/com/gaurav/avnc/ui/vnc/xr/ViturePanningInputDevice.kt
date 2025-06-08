@@ -130,7 +130,10 @@ class ViturePanningInputDevice(private val activity: Activity) : PanningInputDev
         if (enabled) return
 
         mArManager?.registerCallback(mCallback) // This should be before setImuOn generally
-        val result = mArManager?.setImuOn(true)
+        var result = mArManager?.setImuOn(true)
+        Log.i(TAG, "mArManager.setImuOn(true) called. Return code: $result") // Log the result
+        result = mArManager?.setImuFrequency(Constants.IMU_FREQUENCE_240)
+        //result = mArManager?.setImuFrequency(Constants.IMU_FREQUENCE_120)
         Log.i(TAG, "mArManager.setImuOn(true) called. Return code: $result") // Log the result
         if (result == Constants.ERR_SET_SUCCESS) {
             enabled = true
