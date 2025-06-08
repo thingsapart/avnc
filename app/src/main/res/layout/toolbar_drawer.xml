@@ -167,24 +167,23 @@
                 android:layout_gravity="bottom"
                 android:layout_marginHorizontal="@dimen/margin_small"
                 android:background="@drawable/bg_round_rect"
-                android:orientation="vertical"
+                android:orientation="horizontal" <!-- Changed to horizontal -->
                 android:padding="@dimen/padding_small"
                 app:isVisible="@{xrSettingsToggleBtn.checked}">
 
-                <Button
-                    android:id="@+id/xr_display_mode_btn"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/btn_toggle_display_mode_formatted" />
+                <ImageButton
+                    android:id="@+id/xr_display_mode_btn" <!-- Reusing ID, ensure VncActivity uses this -->
+                    style="@style/ImageButton" <!-- Assuming ImageButton style is appropriate -->
+                    android:contentDescription="@string/desc_xr_display_mode_btn"
+                    android:src="@drawable/ic_xr_display_mode" />
 
-                <Button
-                    android:id="@+id/xr_panning_mode_btn"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/btn_toggle_panning_mode_formatted" />
+                <ImageButton
+                    android:id="@+id/xr_panning_mode_btn" <!-- Reusing ID -->
+                    style="@style/ImageButton"
+                    android:layout_marginStart="@dimen/margin_small" <!-- Add margin if needed -->
+                    android:contentDescription="@string/desc_xr_panning_mode_btn"
+                    android:src="@drawable/ic_xr_panning_mode" />
+
             </LinearLayout>
 
         </LinearLayout>

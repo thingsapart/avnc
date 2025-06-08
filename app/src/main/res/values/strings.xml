@@ -258,4 +258,6 @@
     <string name="panning_mode_offset_surface">Offset Surface</string>
     <string name="desc_center_view_btn">Center XR View</string>
     <string name="desc_xr_resolution_btn">Toggle XR Resolution</string>
+    <string name="desc_xr_display_mode_btn">Toggle XR Display Mode</string>
+    <string name="desc_xr_panning_mode_btn">Toggle XR Panning Mode</string>
 </resources>
