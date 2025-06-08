@@ -55,17 +55,17 @@
         <SeekBarPreference
             android:key="xr_viture_sensitivity_x_int"
             android:title="Viture X Sensitivity"
-            android:defaultValue="0"
-            android:max="50"
-            app:min="-50"
+            android:defaultValue="10"
+            android:max="100"
+            app:min="-100"
             app:showSeekBarValue="true"
             android:summary="Adjust horizontal sensitivity (-5.0 to 5.0)" />
         <SeekBarPreference
             android:key="xr_viture_sensitivity_y_int"
             android:title="Viture Y Sensitivity"
-            android:defaultValue="0"
-            android:max="50"
-            app:min="-50"
+            android:defaultValue="10"
+            android:max="100"
+            app:min="-100"
             app:showSeekBarValue="true"
             android:summary="Adjust vertical sensitivity (-5.0 to 5.0)" />
     <ListPreference
@@ -86,17 +86,17 @@
         <SeekBarPreference
             android:key="xr_phone_imu_delta_sensitivity_x_int"
             android:title="Phone IMU Delta X Sensitivity"
-            android:defaultValue="0"
-            android:max="50"
-            app:min="-50"
+            android:defaultValue="10"
+            android:max="100"
+            app:min="-100"
             app:showSeekBarValue="true"
             android:summary="Adjust horizontal sensitivity (-5.0 to 5.0)" />
         <SeekBarPreference
             android:key="xr_phone_imu_delta_sensitivity_y_int"
             android:title="Phone IMU Delta Y Sensitivity"
-            android:defaultValue="0"
-            android:max="50"
-            app:min="-50"
+            android:defaultValue="10"
+            android:max="100"
+            app:min="-100"
             app:showSeekBarValue="true"
             android:summary="Adjust vertical sensitivity (-5.0 to 5.0)" />
         <Preference />
@@ -109,17 +109,17 @@
         <SeekBarPreference
             android:key="xr_phone_rotation_sensitivity_x_int"
             android:title="Phone Rotation X Sensitivity"
-            android:defaultValue="0"
-            android:max="50"
-            app:min="-50"
+            android:defaultValue="10"
+            android:max="100"
+            app:min="-100"
             app:showSeekBarValue="true"
             android:summary="Adjust horizontal sensitivity (-5.0 to 5.0)" />
         <SeekBarPreference
             android:key="xr_phone_rotation_sensitivity_y_int"
             android:title="Phone Rotation Y Sensitivity"
-            android:defaultValue="0"
-            android:max="50"
-            app:min="-50"
+            android:defaultValue="10"
+            android:max="100"
+            app:min="-100"
             app:showSeekBarValue="true"
             android:summary="Adjust vertical sensitivity (-5.0 to 5.0)" />
 

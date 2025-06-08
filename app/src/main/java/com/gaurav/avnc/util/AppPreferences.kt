@@ -170,32 +170,32 @@ class AppPreferences(context: Context) {
 
         // Viture Panning Sensitivities
         var viturePanSensitivityX: Float
-            get() = prefs.getInt("xr_viture_sensitivity_x_int", 0) / 10.0f
-            set(value) = prefs.edit().putInt("xr_viture_sensitivity_x_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
+            get() = prefs.getInt("xr_viture_sensitivity_x_int", 10) / 10.0f
+            set(value) = prefs.edit().putInt("xr_viture_sensitivity_x_int", (value * 10.0f).roundToInt().coerceIn(-100, 100)).apply()
 
         var viturePanSensitivityY: Float
-            get() = prefs.getInt("xr_viture_sensitivity_y_int", 0) / 10.0f
-            set(value) = prefs.edit().putInt("xr_viture_sensitivity_y_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
+            get() = prefs.getInt("xr_viture_sensitivity_y_int", 10) / 10.0f
+            set(value) = prefs.edit().putInt("xr_viture_sensitivity_y_int", (value * 10.0f).roundToInt().coerceIn(-100, 100)).apply()
 
         // Phone IMU Delta Panning Sensitivities
         // Corrected property name to match potential usage, assuming it's phoneImuDeltaSensitivityX not phoneImuDeltaPanSensitivityX
         var phoneImuDeltaSensitivityX: Float
-            get() = prefs.getInt("xr_phone_imu_delta_sensitivity_x_int", 0) / 10.0f
-            set(value) = prefs.edit().putInt("xr_phone_imu_delta_sensitivity_x_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
+            get() = prefs.getInt("xr_phone_imu_delta_sensitivity_x_int", 10) / 10.0f
+            set(value) = prefs.edit().putInt("xr_phone_imu_delta_sensitivity_x_int", (value * 10.0f).roundToInt().coerceIn(-100, 100)).apply()
 
         var phoneImuDeltaSensitivityY: Float
-            get() = prefs.getInt("xr_phone_imu_delta_sensitivity_y_int", 0) / 10.0f
-            set(value) = prefs.edit().putInt("xr_phone_imu_delta_sensitivity_y_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
+            get() = prefs.getInt("xr_phone_imu_delta_sensitivity_y_int", 10) / 10.0f
+            set(value) = prefs.edit().putInt("xr_phone_imu_delta_sensitivity_y_int", (value * 10.0f).roundToInt().coerceIn(-100, 100)).apply()
 
         // Phone Rotation Panning Sensitivities
         // Corrected property name
         var phoneRotationSensitivityX: Float
-            get() = prefs.getInt("xr_phone_rotation_sensitivity_x_int", 0) / 10.0f
-            set(value) = prefs.edit().putInt("xr_phone_rotation_sensitivity_x_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
+            get() = prefs.getInt("xr_phone_rotation_sensitivity_x_int", 10) / 10.0f
+            set(value) = prefs.edit().putInt("xr_phone_rotation_sensitivity_x_int", (value * 10.0f).roundToInt().coerceIn(-100, 100)).apply()
 
         var phoneRotationSensitivityY: Float
-            get() = prefs.getInt("xr_phone_rotation_sensitivity_y_int", 0) / 10.0f
-            set(value) = prefs.edit().putInt("xr_phone_rotation_sensitivity_y_int", (value * 10.0f).roundToInt().coerceIn(-50, 50)).apply()
+            get() = prefs.getInt("xr_phone_rotation_sensitivity_y_int", 10) / 10.0f
+            set(value) = prefs.edit().putInt("xr_phone_rotation_sensitivity_y_int", (value * 10.0f).roundToInt().coerceIn(-100, 100)).apply()
     }
 
     /****************************** Migrations *******************************/
