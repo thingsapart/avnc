@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.WindowManager
 import androidx.annotation.RequiresPermission
 
@@ -25,12 +26,18 @@ object DisplayUtils {
      */
     @RequiresPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS)
     fun setDisplaySize(context: Context, width: Int, height: Int): Boolean {
+        val sizeString = "${width}x${height}"
+        Log.d("DisplayUtils", "Attempting to set display size to: $sizeString")
         return try {
-            val sizeString = "${width}x${height}"
             Settings.Global.putString(context.contentResolver, DISPLAY_SIZE_KEY, sizeString)
+            Log.d("DisplayUtils", "Successfully set display size to: $sizeString")
             true
         } catch (e: SecurityException) {
-            e.printStackTrace()
+            Log.e("DisplayUtils", "Failed to set display size due to SecurityException. Check WRITE_SECURE_SETTINGS permission.", e)
+            // e.printStackTrace() // Log.e with exception object is usually enough for logcat
+            false
+        } catch (e: Exception) {
+            Log.e("DisplayUtils", "Failed to set display size due to an unexpected error.", e)
             false
         }
     }
@@ -45,12 +52,17 @@ object DisplayUtils {
      */
     @RequiresPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS)
     fun resetDisplaySize(context: Context): Boolean {
+        Log.d("DisplayUtils", "Attempting to reset display size.")
         return try {
             // Setting the value to null or an empty string resets it.
             Settings.Global.putString(context.contentResolver, DISPLAY_SIZE_KEY, null)
+            Log.d("DisplayUtils", "Successfully reset display size.")
             true
         } catch (e: SecurityException) {
-            e.printStackTrace()
+            Log.e("DisplayUtils", "Failed to reset display size due to SecurityException. Check WRITE_SECURE_SETTINGS permission.", e)
+            false
+        } catch (e: Exception) {
+            Log.e("DisplayUtils", "Failed to reset display size due to an unexpected error.", e)
             false
         }
     }

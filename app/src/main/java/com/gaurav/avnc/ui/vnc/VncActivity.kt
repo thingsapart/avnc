@@ -143,23 +143,29 @@ class VncActivity : AppCompatActivity() {
         // Set the OnClickListener - the logic for inside the listener will be added in the next step
         xrResolutionButton.setOnClickListener {
             if (isXrResolutionActive) {
-                DisplayUtils.resetDisplaySize(this)
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED // Or restore a saved original orientation if implemented
-                xrResolutionButton.setImageResource(R.drawable.ic_fullscreen) // Change icon back
-                isXrResolutionActive = false
+                if (DisplayUtils.resetDisplaySize(this)) {
+                    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    xrResolutionButton.setImageResource(R.drawable.ic_fullscreen)
+                    isXrResolutionActive = false
+                    Log.d("VncActivity", "XR resolution reset successfully.")
+                } else {
+                    Log.e("VncActivity", "Failed to reset XR resolution.")
+                    Toast.makeText(this, "Failed to reset XR resolution", Toast.LENGTH_SHORT).show()
+                }
             } else {
-                // Save originalDisplaySize again if it's somehow null (shouldn't happen if initialized in onCreate)
                 if (originalDisplaySize == null) {
                     originalDisplaySize = DisplayUtils.getPhysicalDisplaySize(this)
                 }
                 val success = DisplayUtils.setDisplaySize(this, DisplayUtils.XR_DISPLAY_WIDTH, DisplayUtils.XR_DISPLAY_HEIGHT)
                 if (success) {
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    xrResolutionButton.setImageResource(R.drawable.ic_fullscreen_exit) // Change icon to 'exit fullscreen'
+                    xrResolutionButton.setImageResource(R.drawable.ic_fullscreen_exit)
                     isXrResolutionActive = true
+                    Log.d("VncActivity", "XR resolution set successfully to ${DisplayUtils.XR_DISPLAY_WIDTH}x${DisplayUtils.XR_DISPLAY_HEIGHT}.")
                 } else {
-                    // Optional: Show a Toast or log if permission was denied or setting failed
-                    // Toast.makeText(this, "Failed to set XR resolution. Check permissions.", Toast.LENGTH_LONG).show()
+                    Log.e("VncActivity", "Failed to set XR resolution. Check permissions or logs.")
+                    Toast.makeText(this, "Failed to set XR resolution. Check permissions.", Toast.LENGTH_LONG).show()
+                    // Keep orientation as is, don't set isXrResolutionActive to true, and don't change icon
                 }
             }
         }
