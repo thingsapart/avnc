@@ -143,7 +143,7 @@ class VncActivity : AppCompatActivity() {
         // Set the OnClickListener - the logic for inside the listener will be added in the next step
         xrResolutionButton.setOnClickListener {
             if (isXrResolutionActive) {
-                if (DisplayUtils.resetDisplaySize(this)) {
+                if (DisplayUtils.clearForcedDisplaySize(this)) {
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
                     xrResolutionButton.setImageResource(R.drawable.ic_fullscreen)
                     isXrResolutionActive = false
@@ -156,7 +156,7 @@ class VncActivity : AppCompatActivity() {
                 if (originalDisplaySize == null) {
                     originalDisplaySize = DisplayUtils.getPhysicalDisplaySize(this)
                 }
-                val success = DisplayUtils.setDisplaySize(this, DisplayUtils.XR_DISPLAY_WIDTH, DisplayUtils.XR_DISPLAY_HEIGHT)
+                val success = DisplayUtils.setForcedDisplaySize(this, DisplayUtils.XR_DISPLAY_HEIGHT, DisplayUtils.XR_DISPLAY_WIDTH)
                 if (success) {
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                     xrResolutionButton.setImageResource(R.drawable.ic_fullscreen_exit)

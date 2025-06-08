@@ -428,10 +428,10 @@ class Toolbar(private val activity: VncActivity) {
     private fun updateXRButtonLabels() {
         val displayMode = viewModel.pref.xr.displayMode
         val displayModeStringRes = if (displayMode == "flat") R.string.display_mode_flat else R.string.display_mode_cylindrical
-        binding.xrDisplayModeBtn.text = activity.getString(R.string.btn_toggle_display_mode_formatted, activity.getString(displayModeStringRes))
+        //binding.xrDisplayModeBtn.text = activity.getString(R.string.btn_toggle_display_mode_formatted, activity.getString(displayModeStringRes))
 
         val panningMode = viewModel.pref.xr.panningMode
         val panningModeStringRes = if (panningMode == "rotation") R.string.panning_mode_rotation else R.string.panning_mode_offset_surface
-        binding.xrPanningModeBtn.text = activity.getString(R.string.btn_toggle_panning_mode_formatted, activity.getString(panningModeStringRes))
+        //binding.xrPanningModeBtn.text = activity.getString(R.string.btn_toggle_panning_mode_formatted, activity.getString(panningModeStringRes))
     }
 }

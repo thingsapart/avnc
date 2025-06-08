@@ -25,7 +25,6 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.gaurav.avnc.R
-import com.gaurav.avnc.R
 import com.gaurav.avnc.databinding.ActivityHomeBinding
 import com.gaurav.avnc.model.ServerProfile
 import com.gaurav.avnc.ui.about.AboutActivity

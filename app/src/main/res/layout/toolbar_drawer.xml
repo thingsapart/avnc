@@ -167,20 +167,20 @@
                 android:layout_gravity="bottom"
                 android:layout_marginHorizontal="@dimen/margin_small"
                 android:background="@drawable/bg_round_rect"
-                android:orientation="horizontal" <!-- Changed to horizontal -->
+                android:orientation="horizontal"
                 android:padding="@dimen/padding_small"
                 app:isVisible="@{xrSettingsToggleBtn.checked}">
 
                 <ImageButton
-                    android:id="@+id/xr_display_mode_btn" <!-- Reusing ID, ensure VncActivity uses this -->
-                    style="@style/ImageButton" <!-- Assuming ImageButton style is appropriate -->
+                    android:id="@+id/xr_display_mode_btn"
+                    style="@style/ImageButton"
                     android:contentDescription="@string/desc_xr_display_mode_btn"
                     android:src="@drawable/ic_xr_display_mode" />
 
                 <ImageButton
-                    android:id="@+id/xr_panning_mode_btn" <!-- Reusing ID -->
+                    android:id="@+id/xr_panning_mode_btn"
                     style="@style/ImageButton"
-                    android:layout_marginStart="@dimen/margin_small" <!-- Add margin if needed -->
+                    android:layout_marginStart="@dimen/margin_small"
                     android:contentDescription="@string/desc_xr_panning_mode_btn"
                     android:src="@drawable/ic_xr_panning_mode" />
 
