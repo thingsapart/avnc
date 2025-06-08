@@ -58,12 +58,14 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var xrResolutionMenuItem: MenuItem // To change the icon later
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Theme and window features should be set before super.onCreate and setContentView
         setTheme(R.style.App_Theme)
-        super.onCreate(savedInstanceState)
         window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+        // Potentially add other window.requestFeature calls here if they were duplicated too,
+        // ensuring each specific feature is requested only once.
+        // From the provided code, only one type of feature request was shown duplicated.
 
-        super.onCreate(savedInstanceState)
-        window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+        super.onCreate(savedInstanceState) // Call super.onCreate ONCE
 
         //View Inflation
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
